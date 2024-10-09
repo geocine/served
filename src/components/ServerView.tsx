@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Server, Component, DeviceComponent, CommonComponent } from '../types';
 import {
   Search,
@@ -49,10 +49,17 @@ const ServerView: React.FC<ServerViewProps> = ({ server }) => {
   const [expandedFiles, setExpandedFiles] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
 
+  // Automatically select the first component when the server loads
+  useEffect(() => {
+    if (server.components.length > 0) {
+      setSelectedComponent(server.components[0]);
+    }
+  }, [server]);
+
   const renderJsonView = () => (
     <div className="bg-secondary-900 p-4 rounded-lg shadow">
       {jsonViewMode === 'interactive' ? (
-        <JsonViewer data={server} name={server.name} />
+        <JsonViewer data={server} />
       ) : (
         <pre className="bg-secondary-800 p-4 rounded-lg overflow-x-auto text-sm text-secondary-200">
           {JSON.stringify(server, null, 2)}
@@ -94,46 +101,48 @@ const ServerView: React.FC<ServerViewProps> = ({ server }) => {
   );
 
   const renderFileTable = (files: string[]) => (
-    <table className="min-w-full divide-y divide-secondary-700">
-      <thead className="bg-secondary-800">
-        <tr>
-          <th
-            scope="col"
-            className="px-6 py-3 text-left text-xs font-medium text-secondary-400 uppercase tracking-wider"
-          >
-            File Name
-          </th>
-          <th
-            scope="col"
-            className="px-6 py-3 text-left text-xs font-medium text-secondary-400 uppercase tracking-wider"
-          >
-            Content
-          </th>
-        </tr>
-      </thead>
-      <tbody className="bg-secondary-900 divide-y divide-secondary-800">
-        {files.map((file) => (
-          <tr key={file}>
-            <td className="px-6 py-4 whitespace-nowrap text-sm text-secondary-300">
-              {file}
-            </td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm text-secondary-300">
-              <button
-                onClick={() => toggleFileExpansion(file)}
-                className="text-primary-400 hover:text-primary-300"
-              >
-                {expandedFiles.includes(file) ? 'Hide Content' : 'Show Content'}
-              </button>
-              {expandedFiles.includes(file) && (
-                <div className="mt-2">
-                  <JsonViewer data={getMockJsonContent()} name={file} />
-                </div>
-              )}
-            </td>
+    <div className="bg-secondary-900 p-4 rounded-lg shadow">
+      <table className="min-w-full table-fixed divide-y divide-secondary-700">
+        <thead className="bg-secondary-800">
+          <tr>
+            <th
+              scope="col"
+              className="w-24 px-6 py-3 text-left text-xs font-medium text-secondary-400 uppercase tracking-wider"
+            >
+              File Name
+            </th>
+            <th
+              scope="col"
+              className="px-6 py-3 text-left text-xs font-medium text-secondary-400 uppercase tracking-wider"
+            >
+              Content
+            </th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody className="bg-secondary-900 divide-y divide-secondary-800">
+          {files.map((file) => (
+            <tr key={file}>
+              <td className="w-24 px-6 py-4 whitespace-nowrap text-sm text-secondary-300 align-top">
+                {file}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-secondary-300">
+                <button
+                  onClick={() => toggleFileExpansion(file)}
+                  className="text-primary-400 hover:text-primary-300"
+                >
+                  {expandedFiles.includes(file) ? 'Hide Content' : 'Show Content'}
+                </button>
+                {expandedFiles.includes(file) && (
+                  <div className="mt-2 bg-secondary-800 p-4 rounded-lg">
+                    <JsonViewer data={getMockJsonContent()} />
+                  </div>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 
   const toggleFileExpansion = (file: string) => {
@@ -236,7 +245,7 @@ const ServerView: React.FC<ServerViewProps> = ({ server }) => {
           onClick={() => setSelectedComponent(component)}
           className={`flex items-center w-full text-left px-4 py-2 rounded-md ${
             selectedComponent?.name === component.name
-              ? 'bg-primary-500 text-black'
+              ? 'bg-black bg-opacity-30 text-white'
               : 'hover:bg-secondary-800 text-secondary-300'
           }`}
         >

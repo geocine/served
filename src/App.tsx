@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { servers } from './data';
 import { Server } from './types';
 import ServerView from './components/ServerView';
@@ -16,6 +16,13 @@ function App() {
   >([null, null]);
 
   const [comparisonMode, setComparisonMode] = useState(false);
+
+  useEffect(() => {
+    if (servers.length > 0) {
+      setSelectedServer(servers[0]);
+      setSelectedServers([servers[0], null]);
+    }
+  }, []);
 
   const handleSelectServer = (serverName: string | null, index: 0 | 1) => {
     const server = serverName
@@ -36,7 +43,13 @@ function App() {
   };
 
   const reverseComparison = () => {
-    setSelectedServers([selectedServers[1], selectedServers[0]]);
+    if (!selectedServers[0] && selectedServers[1]) {
+      setSelectedServers([selectedServers[1], null]);
+      setSelectedServer(selectedServers[1]);
+      setComparisonMode(false);
+    } else {
+      setSelectedServers([selectedServers[1], selectedServers[0]]);
+    }
   };
 
   const EmptyPlaceholder = ({ message }: { message: string }) => (

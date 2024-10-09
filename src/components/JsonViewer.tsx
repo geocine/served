@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronRight, File } from 'lucide-react';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 
 interface JsonViewerProps {
   data: any;
@@ -26,7 +26,7 @@ const JsonViewer: React.FC<JsonViewerProps> = ({ data, name, isRoot = true }) =>
             Interactive View
           </button>
         </div>
-        <pre className="bg-secondary-800 p-4 rounded-lg overflow-x-auto text-secondary-200">
+        <pre className={`bg-secondary-800 ${name ? 'p-4' : 'pt-2 mt-[-40px]'} rounded-lg overflow-x-auto text-secondary-200`}>
           {JSON.stringify(data, null, 2)}
         </pre>
       </div>
@@ -57,7 +57,6 @@ const JsonViewer: React.FC<JsonViewerProps> = ({ data, name, isRoot = true }) =>
           )}
           {name && (
             <>
-              <File className="w-4 h-4 ml-1 mr-2 text-secondary-400" />
               <span className="text-primary-400 mr-2">{name}</span>
             </>
           )}
@@ -68,7 +67,7 @@ const JsonViewer: React.FC<JsonViewerProps> = ({ data, name, isRoot = true }) =>
         {isRoot && (
           <button
             onClick={toggleViewMode}
-            className="px-2 py-1 text-xs bg-secondary-700 text-secondary-200 rounded"
+            className="px-2 py-1 text-xs bg-secondary-700 text-secondary-200 rounded ml-2"
           >
             Text View
           </button>
