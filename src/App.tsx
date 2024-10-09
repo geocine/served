@@ -98,7 +98,7 @@ function App() {
             }
           >
             {comparisonMode ? (
-              <ServerComparison servers={selectedServers} />
+              <ServerComparison servers={selectedServers.filter((server): server is Server => server !== null)} />
             ) : selectedServer ? (
               <ServerView server={selectedServer} />
             ) : (
