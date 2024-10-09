@@ -5,8 +5,8 @@ import { ServerIcon, Search } from 'lucide-react';
 interface ServerListProps {
   servers: Server[];
   selectedServer: Server | null;
-  selectedServers: Server[];
-  onSelectServer: (server: Server) => void;
+  selectedServers: [Server | null, Server | null];
+  onSelectServer: (server: Server, index: 0 | 1) => void;
   comparisonMode: boolean;
   serverFilter: string;
   setServerFilter: (filter: string) => void;
@@ -38,10 +38,10 @@ const ServerList: React.FC<ServerListProps> = ({
         {servers.map((server) => (
           <li key={server.name}>
             <button
-              onClick={() => onSelectServer(server)}
+              onClick={() => onSelectServer(server, 0)}
               className={`flex items-center space-x-2 w-full text-left px-3 py-2 rounded ${
                 (comparisonMode
-                  ? selectedServers.some((s) => s.name === server.name)
+                  ? selectedServers.some((s) => s?.name === server.name)
                   : selectedServer?.name === server.name)
                   ? 'bg-primary-50 dark:bg-primary-900 text-primary-700 dark:text-primary-200'
                   : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'

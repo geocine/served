@@ -4,18 +4,26 @@ import { Server } from './types';
 import ServerView from './components/ServerView';
 import ServerComparison from './components/ServerComparison';
 import ThemeToggle from './components/ThemeToggle';
-import { Layers, GitCompare } from 'lucide-react';
+import { GitCompare } from 'lucide-react';
 import { ThemeProvider } from './contexts/ThemeContext';
 import ErrorBoundary from './components/ErrorBoundary';
+import FilterableDropdown from './components/FilterableDropdown';
 
 function App() {
   const [selectedServer, setSelectedServer] = useState<Server | null>(null);
-  const [selectedServers, setSelectedServers] = useState<Server[]>([]);
-  const [comparisonMode, setComparisonMode] = useState(false);
-  const [serverFilter, setServerFilter] = useState('');
+  const [selectedServers, setSelectedServers] = useState<
+    [Server | null, Server | null]
+  >([null, null]);
 
-  const handleSelectServer = (server: Server, index: number) => {
-    const newSelectedServers = [...selectedServers];
+  const [comparisonMode, setComparisonMode] = useState(false);
+
+  const handleSelectServer = (serverName: string | null, index: 0 | 1) => {
+    const server = serverName
+      ? servers.find((s) => s.name === serverName) || null
+      : null;
+    const newSelectedServers: [Server | null, Server | null] = [
+      ...selectedServers,
+    ];
     newSelectedServers[index] = server;
     setSelectedServers(newSelectedServers);
 
@@ -23,7 +31,7 @@ function App() {
       setComparisonMode(true);
     } else {
       setComparisonMode(false);
-      setSelectedServer(newSelectedServers[0] || null);
+      setSelectedServer(newSelectedServers[0]);
     }
   };
 
@@ -31,60 +39,64 @@ function App() {
     setSelectedServers([selectedServers[1], selectedServers[0]]);
   };
 
-  const filteredServers = servers.filter(server =>
-    server.name.toLowerCase().includes(serverFilter.toLowerCase())
-  );
-
   const EmptyPlaceholder = ({ message }: { message: string }) => (
-    <div className="flex flex-col items-center justify-center h-full text-center p-8 bg-white dark:bg-gray-800 rounded-sm shadow-md">
-      <h2 className="text-2xl font-semibold text-gray-700 dark:text-gray-300 mb-2">{message}</h2>
-      <p className="text-gray-500 dark:text-gray-400">Select a server from the dropdown to view its details.</p>
+    <div className="flex flex-col items-center justify-center h-full text-center p-8 bg-secondary-900 rounded shadow-md">
+      <h2 className="text-2xl font-semibold text-secondary-200 mb-2">
+        {message}
+      </h2>
+      <p className="text-secondary-400">
+        Select a server from the dropdown to view its details.
+      </p>
     </div>
   );
 
   return (
     <ThemeProvider>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
-        <header className="bg-white dark:bg-gray-800 shadow-sm">
+      <div className="min-h-screen bg-secondary-900 flex flex-col">
+        <header className="bg-secondary-900 shadow-sm border-b border-secondary-800">
           <div className="max-w-7xl mx-auto py-4 px-6 flex items-center justify-between">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Server Monitoring Dashboard</h1>
+              <h1 className="text-2xl font-bold text-primary-400">
+                Server Monitoring Dashboard
+              </h1>
             </div>
             <div className="flex items-center space-x-4">
-              <select
-                onChange={(e) => handleSelectServer(servers.find(s => s.name === e.target.value)!, 0)}
-                value={selectedServers[0]?.name || ''}
-                className="px-4 py-2 rounded-sm border border-gray-300 dark:border-gray-600"
+              <FilterableDropdown
+                options={servers.map((s) => s.name)}
+                selectedOption={selectedServers[0]?.name || ''}
+                onChange={(value) => handleSelectServer(value, 0)}
+                placeholder="Select Server 1"
+              />
+              <FilterableDropdown
+                options={servers.map((s) => s.name)}
+                selectedOption={selectedServers[1]?.name || ''}
+                onChange={(value) => handleSelectServer(value, 1)}
+                placeholder="Select Server 2"
+              />
+              <button
+                onClick={reverseComparison}
+                disabled={!selectedServers[1]}
+                className={`p-2 rounded transition-colors ${
+                  selectedServers[1]
+                    ? 'bg-primary-500 text-black hover:bg-primary-400'
+                    : 'bg-secondary-800 text-secondary-600 cursor-not-allowed'
+                }`}
+                aria-label="Reverse comparison"
               >
-                <option value="">Select Server 1</option>
-                {filteredServers.map(server => (
-                  <option key={server.name} value={server.name}>{server.name}</option>
-                ))}
-              </select>
-              <select
-                onChange={(e) => handleSelectServer(servers.find(s => s.name === e.target.value)!, 1)}
-                value={selectedServers[1]?.name || ''}
-                className="px-4 py-2 rounded-sm border border-gray-300 dark:border-gray-600"
-              >
-                <option value="">Select Server 2</option>
-                {filteredServers.map(server => (
-                  <option key={server.name} value={server.name}>{server.name}</option>
-                ))}
-              </select>
-              {comparisonMode && (
-                <button
-                  onClick={reverseComparison}
-                  className="px-4 py-2 bg-primary-100 dark:bg-primary-700 text-primary-700 dark:text-primary-100 rounded-sm"
-                >
-                  Reverse Comparison
-                </button>
-              )}
+                <GitCompare className="w-5 h-5" />
+              </button>
               <ThemeToggle />
             </div>
           </div>
         </header>
         <main className="flex-1 p-6">
-          <ErrorBoundary fallback={<div className="text-red-500">An error occurred while rendering the content.</div>}>
+          <ErrorBoundary
+            fallback={
+              <div className="text-accent-500">
+                An error occurred while rendering the content.
+              </div>
+            }
+          >
             {comparisonMode ? (
               <ServerComparison servers={selectedServers} />
             ) : selectedServer ? (

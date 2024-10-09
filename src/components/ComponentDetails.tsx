@@ -1,5 +1,5 @@
 import React from 'react';
-import { Component } from '../types';
+import { Component, DeviceComponent, CommonComponent } from '../types';
 import JsonViewer from './JsonViewer';
 import { File } from 'lucide-react';
 
@@ -13,7 +13,7 @@ interface ComponentDetailsProps {
 const ComponentDetails: React.FC<ComponentDetailsProps> = ({ component1, component2, server1Name, server2Name }) => {
   if (!component1 || !component2) {
     return (
-      <div className="text-red-500 dark:text-red-400">
+      <div className="text-accent-500">
         Error: One or both components are undefined. Unable to compare.
       </div>
     );
@@ -26,11 +26,11 @@ const ComponentDetails: React.FC<ComponentDetailsProps> = ({ component1, compone
     return (
       <div className="mb-2">
         <span className="font-semibold">{label}: </span>
-        <span className={isDifferent ? 'bg-yellow-100 dark:bg-yellow-900' : ''}>
+        <span className={isDifferent ? 'bg-secondary-800' : ''}>
           {value1}
         </span>
         {isDifferent && (
-          <span className="ml-2 text-accent-500 dark:text-accent-400">
+          <span className="ml-2 text-accent-500">
             → {value2}
           </span>
         )}
@@ -49,12 +49,12 @@ const ComponentDetails: React.FC<ComponentDetailsProps> = ({ component1, compone
             const dep2 = deps2.find(d => d.name === depName);
             const isDifferent = !dep1 || !dep2 || dep1.commit !== dep2.commit || dep1.version !== dep2.version;
             return (
-              <li key={depName} className={isDifferent ? 'bg-yellow-100 dark:bg-yellow-900' : ''}>
+              <li key={depName} className={isDifferent ? 'bg-secondary-800' : ''}>
                 {depName}:
                 {' '}
                 {dep1 ? (dep1.commit || dep1.version) : 'N/A'}
                 {isDifferent && (
-                  <span className="ml-2 text-accent-500 dark:text-accent-400">
+                  <span className="ml-2 text-accent-500">
                     → {dep2 ? (dep2.commit || dep2.version) : 'N/A'}
                   </span>
                 )}
@@ -84,31 +84,31 @@ const ComponentDetails: React.FC<ComponentDetailsProps> = ({ component1, compone
         {renderDiff("URL", component1.url, component2.url)}
         {renderDiff("Version", component1.version, component2.version)}
         {renderDiff("Commit", component1.commit, component2.commit)}
-        {isDeviceComponent && renderDiff("PID", (component1 as any).pid, (component2 as any).pid)}
+        {isDeviceComponent && renderDiff("PID", (component1 as DeviceComponent).pid, (component2 as DeviceComponent).pid)}
       </div>
       <div>
         <h3 className="font-semibold mb-2">Dependencies</h3>
         {isDeviceComponent ? (
           <>
-            {renderDependenciesDiff((component1 as any).packageDependencies, (component2 as any).packageDependencies, "Package Dependencies")}
-            {renderDependenciesDiff((component1 as any).binaryDependencies, (component2 as any).binaryDependencies, "Binary Dependencies")}
+            {renderDependenciesDiff((component1 as DeviceComponent).packageDependencies, (component2 as DeviceComponent).packageDependencies, "Package Dependencies")}
+            {renderDependenciesDiff((component1 as DeviceComponent).binaryDependencies, (component2 as DeviceComponent).binaryDependencies, "Binary Dependencies")}
           </>
         ) : (
           <ul className="list-disc pl-5">
-            {(component1 as any).dependencies.map((dep: string) => (
-              <li key={dep} className={(component2 as any).dependencies.includes(dep) ? '' : 'bg-yellow-100 dark:bg-yellow-900'}>
+            {(component1 as CommonComponent).dependencies.map((dep: string) => (
+              <li key={dep} className={(component2 as CommonComponent).dependencies.includes(dep) ? '' : 'bg-secondary-800'}>
                 {dep}
-                {!(component2 as any).dependencies.includes(dep) && (
-                  <span className="ml-2 text-accent-500 dark:text-accent-400">
+                {!(component2 as CommonComponent).dependencies.includes(dep) && (
+                  <span className="ml-2 text-accent-500">
                     → Removed
                   </span>
                 )}
               </li>
             ))}
-            {(component2 as any).dependencies.filter((dep: string) => !(component1 as any).dependencies.includes(dep)).map((dep: string) => (
-              <li key={dep} className="bg-yellow-100 dark:bg-yellow-900">
+            {(component2 as CommonComponent).dependencies.filter((dep: string) => !(component1 as CommonComponent).dependencies.includes(dep)).map((dep: string) => (
+              <li key={dep} className="bg-secondary-800">
                 {dep}
-                <span className="ml-2 text-secondary-500 dark:text-secondary-400">
+                <span className="ml-2 text-primary-400">
                   → Added
                 </span>
               </li>
@@ -120,13 +120,13 @@ const ComponentDetails: React.FC<ComponentDetailsProps> = ({ component1, compone
         <div>
           <h3 className="font-semibold mb-2">Files</h3>
           <ul className="space-y-2">
-            {(component1 as any).files.map((file: string) => (
+            {(component1 as CommonComponent).files.map((file: string) => (
               <li key={file}>
-                <div className="flex items-center space-x-2 text-blue-600 dark:text-blue-400">
+                <div className="flex items-center space-x-2 text-primary-400">
                   <File className="w-4 h-4" />
                   <span>{file}</span>
                 </div>
-                <div className="mt-2 p-3 bg-gray-100 dark:bg-gray-600 rounded">
+                <div className="mt-2 p-3 bg-secondary-800 rounded">
                   <JsonViewer data={getJsonContent(file)} name={file} />
                 </div>
               </li>
