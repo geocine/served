@@ -58,10 +58,10 @@ const FilterableDropdown: React.FC<FilterableDropdownProps> = ({
   return (
     <div className="relative" ref={dropdownRef}>
       <div
-        className="flex items-center justify-between w-64 px-4 py-2 text-sm bg-secondary-900 border border-secondary-700 rounded shadow-sm cursor-pointer"
+        className="flex items-center justify-between w-64 h-10 px-4 py-2 text-sm bg-secondary-900 border border-secondary-700 rounded shadow-sm cursor-pointer"
         onClick={toggleDropdown}
       >
-        <span className="text-secondary-200">
+        <span className={`text-secondary-200 ${!selectedOption ? 'text-secondary-400' : ''}`}>
           {selectedOption || placeholder}
         </span>
         <div className="flex items-center">

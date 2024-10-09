@@ -23,7 +23,7 @@ export interface CommonComponent {
   name: string;
   version: string;
   commit: string;
-  dependencies: string[];
+  dependencies: PackageDependency[];
   files: string[];
 }
 

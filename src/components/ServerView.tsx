@@ -11,7 +11,7 @@ import {
   File,
 } from 'lucide-react';
 import JsonViewer from './JsonViewer';
-
+import { PackageDependency, BinaryDependency } from '../types';
 interface ServerViewProps {
   server: Server;
 }
@@ -43,7 +43,7 @@ const ServerView: React.FC<ServerViewProps> = ({ server }) => {
     null
   );
   const [viewMode, setViewMode] = useState<'table' | 'json'>('table');
-  const [jsonViewMode, setJsonViewMode] = useState<'interactive' | 'text'>(
+  const [jsonViewMode] = useState<'interactive' | 'text'>(
     'interactive'
   );
   const [expandedFiles, setExpandedFiles] = useState<string[]>([]);
@@ -61,7 +61,7 @@ const ServerView: React.FC<ServerViewProps> = ({ server }) => {
     </div>
   );
 
-  const renderTable = (data: any[], columns: string[]) => (
+  const renderTable = (data: Array<PackageDependency | BinaryDependency>, columns: string[]) => (
     <table className="min-w-full divide-y divide-secondary-700">
       <thead className="bg-secondary-800">
         <tr>
@@ -84,7 +84,7 @@ const ServerView: React.FC<ServerViewProps> = ({ server }) => {
                 key={column}
                 className="px-6 py-4 whitespace-nowrap text-sm text-secondary-300"
               >
-                {item[column.toLowerCase()]}
+                {item[column.toLowerCase() as keyof typeof item]}
               </td>
             ))}
           </tr>
@@ -126,7 +126,7 @@ const ServerView: React.FC<ServerViewProps> = ({ server }) => {
               </button>
               {expandedFiles.includes(file) && (
                 <div className="mt-2">
-                  <JsonViewer data={getMockJsonContent(file)} name={file} />
+                  <JsonViewer data={getMockJsonContent()} name={file} />
                 </div>
               )}
             </td>
@@ -142,7 +142,7 @@ const ServerView: React.FC<ServerViewProps> = ({ server }) => {
     );
   };
 
-  const getMockJsonContent = (file: string) => {
+  const getMockJsonContent = () => {
     return {
       key1: 'value1',
       key2: {
@@ -208,9 +208,12 @@ const ServerView: React.FC<ServerViewProps> = ({ server }) => {
             ) : (
               <>
                 {activeTab === 'package' &&
-                  renderTable(
-                    commonComponent.dependencies.map((dep) => ({ name: dep })),
-                    ['Name']
+                   renderTable(
+                    commonComponent.dependencies.map((dep) => ({
+                      name: dep.name, // Assuming dep is now a PackageDependency
+                      commit: dep.commit // Provide necessary properties
+                    })),
+                    ['Name', 'Commit'] // Updated columns to match the data
                   )}
                 {activeTab === 'file' && renderFileTable(commonComponent.files)}
               </>
