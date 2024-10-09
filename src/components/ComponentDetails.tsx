@@ -10,7 +10,7 @@ interface ComponentDetailsProps {
   server2Name: string;
 }
 
-const ComponentDetails: React.FC<ComponentDetailsProps> = ({ component1, component2, server1Name, server2Name }) => {
+const ComponentDetails: React.FC<ComponentDetailsProps> = ({ component1, component2 }) => {
   if (!component1 || !component2) {
     return (
       <div className="text-accent-500">
@@ -127,7 +127,7 @@ const ComponentDetails: React.FC<ComponentDetailsProps> = ({ component1, compone
                   <span>{file}</span>
                 </div>
                 <div className="mt-2 p-3 bg-secondary-800 rounded">
-                  <JsonViewer data={getJsonContent(file)} name={file} />
+                  <JsonViewer data={getJsonContent(file)} />
                 </div>
               </li>
             ))}
