@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 
 interface JsonViewerProps {
-  data: any;
+  data: JsonValue;
   name?: string;
   isRoot?: boolean;
 }
+
+type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
 
 const JsonViewer: React.FC<JsonViewerProps> = ({ data, name, isRoot = true }) => {
   const [isExpanded, setIsExpanded] = useState(isRoot);

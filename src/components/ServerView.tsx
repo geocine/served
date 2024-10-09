@@ -38,7 +38,7 @@ const Tab: React.FC<TabProps> = ({ label, icon, isActive, onClick }) => (
 );
 
 const ServerView: React.FC<ServerViewProps> = ({ server }) => {
-  const [activeTab, setActiveTab] = useState<string>('package');
+  const [activeTab, setActiveTab] = useState<string>('');
   const [selectedComponent, setSelectedComponent] = useState<Component | null>(
     null
   );
@@ -49,7 +49,16 @@ const ServerView: React.FC<ServerViewProps> = ({ server }) => {
   const [expandedFiles, setExpandedFiles] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Automatically select the first component when the server loads
+  useEffect(() => {
+    if (selectedComponent) {
+      if ('pid' in selectedComponent) {
+        setActiveTab('package');
+      } else {
+        setActiveTab('package');
+      }
+    }
+  }, [selectedComponent]);
+
   useEffect(() => {
     if (server.components.length > 0) {
       setSelectedComponent(server.components[0]);
@@ -185,12 +194,14 @@ const ServerView: React.FC<ServerViewProps> = ({ server }) => {
               isActive={activeTab === 'package'}
               onClick={() => setActiveTab('package')}
             />
-            <Tab
-              label="Binary Dependencies"
-              icon={<Binary className="w-4 h-4" />}
-              isActive={activeTab === 'binary'}
-              onClick={() => setActiveTab('binary')}
-            />
+            {isDeviceComponent && (
+              <Tab
+                label="Binary Dependencies"
+                icon={<Binary className="w-4 h-4" />}
+                isActive={activeTab === 'binary'}
+                onClick={() => setActiveTab('binary')}
+              />
+            )}
             {!isDeviceComponent && (
               <Tab
                 label="Files"
